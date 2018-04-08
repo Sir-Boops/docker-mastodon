@@ -29,8 +29,8 @@ RUN apt update && \
 	su - -s /bin/bash mastodon -c "rbenv global $RUBY_VER" && \
 	su - -s /bin/bash mastodon -c "wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz" && \
 	su - -s /bin/bash mastodon -c "tar xf v$MASTO_VER.tar.gz" && \
-    su - -s /bin/bash mastodon -c "wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff"
-    su - -s /bin/bash mastodon -c "patch -s -p0 < patchset.diff"
+    su - -s /bin/bash mastodon -c "wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff" && \
+    su - -s /bin/bash mastodon -c "patch -s -p0 < patchset.diff" && \
 	su - -s /bin/bash mastodon -c "mv mastodon-2.3.3 mastodon && rm v$MASTO_VER.tar.gz" && \
 	su - -s /bin/bash mastodon -c "cd mastodon && gem install bundler" && \
 	su - -s /bin/bash mastodon -c "cd mastodon && bundle install -j$(nproc) --deployment --without development test" && \
