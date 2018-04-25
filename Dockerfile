@@ -19,7 +19,7 @@ RUN apt update && \
         gcc autoconf bison build-essential libssl-dev libyaml-dev \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 \
         libgdbm-dev nginx redis-server redis-tools postgresql postgresql-contrib \
-        letsencrypt yarn libidn11-dev libicu-dev
+        letsencrypt yarn libidn11-dev libicu-dev libjemalloc-dev
 
 USER mastodon
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
@@ -32,7 +32,7 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     export PATH="$HOME/.rbenv/bin:$PATH" && \
     rbenv init - && \
     git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
-    rbenv install $RUBY_VER && \
+    RUBY_CONFIGURE_OPTS="--with-jemalloc" rbenv install $RUBY_VER && \
     rbenv global $RUBY_VER && \
     export PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" && \
     wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz && \
