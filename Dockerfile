@@ -19,20 +19,30 @@ RUN apt update && \
         gcc autoconf bison build-essential libssl-dev libyaml-dev \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 \
         libgdbm-dev nginx redis-server redis-tools postgresql postgresql-contrib \
-        letsencrypt yarn libidn11-dev libicu-dev && \
-    su - -s /bin/bash mastodon -c "git clone https://github.com/rbenv/rbenv.git ~/.rbenv" && \
-    su - -s /bin/bash mastodon -c "cd ~/.rbenv && src/configure && make -C src" && \
-    su - -s /bin/bash mastodon -c 'echo export PATH="$HOME/.rbenv/bin:$PATH" >> ~/.bash_profile' && \
-    su - -s /bin/bash mastodon -c 'echo eval "$(rbenv init -)" >> ~/.bash_profile' && \
-    su - -s /bin/bash mastodon -c "git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build" && \
-    su - -s /bin/bash mastodon -c "rbenv install $RUBY_VER" && \
-    su - -s /bin/bash mastodon -c "rbenv global $RUBY_VER" && \
-    su - -s /bin/bash mastodon -c "wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz" && \
-    su - -s /bin/bash mastodon -c "tar xf v$MASTO_VER.tar.gz" && \
-    su - -s /bin/bash mastodon -c "wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff" && \
-    su - -s /bin/bash mastodon -c "patch -s -p0 < patchset.diff" && \
-    su - -s /bin/bash mastodon -c "mv mastodon-2.3.3 mastodon && rm v$MASTO_VER.tar.gz" && \
-    su - -s /bin/bash mastodon -c "cd mastodon && gem install bundler" && \
-    su - -s /bin/bash mastodon -c "cd mastodon && bundle install -j$(nproc) --deployment --without development test" && \
-    su - -s /bin/bash mastodon -c "cd mastodon && yarn install --pure-lockfile"
+        letsencrypt yarn libidn11-dev libicu-dev
+
+USER mastodon
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
+    cd ~/.rbenv && \
+    src/configure && \
+    make -C src && \
+    cd ~ && \
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile && \
+    echo 'eval "$(rbenv init -)"' >> ~/.bash_profile && \
+    export PATH="$HOME/.rbenv/bin:$PATH" && \
+    rbenv init - && \
+    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
+    rbenv install $RUBY_VER && \
+    rbenv global $RUBY_VER && \
+    export PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" && \
+    wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz && \
+    tar xf v$MASTO_VER.tar.gz && \
+    wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff && \
+    patch -s -p0 < patchset.diff && \
+    mv mastodon-2.3.3 mastodon && \
+    rm v$MASTO_VER.tar.gz && \
+    cd mastodon && \
+    gem install bundler && \
+    bundle install -j$(nproc) --deployment --without development test && \
+    yarn install --pure-lockfile
 
