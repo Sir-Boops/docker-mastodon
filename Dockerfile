@@ -9,6 +9,7 @@ RUN apt update && \
     echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
 RUN apt update && \
+    apt -y dist-upgrade && \
     apt -y install curl wget && \
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -18,8 +19,7 @@ RUN apt update && \
         file git-core g++ libprotobuf-dev protobuf-compiler pkg-config nodejs \
         gcc autoconf bison build-essential libssl-dev libyaml-dev \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 \
-        libgdbm-dev nginx redis-server redis-tools postgresql postgresql-contrib \
-        letsencrypt yarn libidn11-dev libicu-dev libjemalloc-dev
+        libgdbm-dev redis-tools postgresql-contrib yarn libidn11-dev libicu-dev libjemalloc-dev
 
 USER mastodon
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
