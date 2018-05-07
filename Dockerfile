@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-ENV MASTO_VER="2.3.3"
+ENV MASTO_VER="2.4.0rc1"
 ENV RUBY_VER="2.5.0"
 
 RUN apt update && \
@@ -39,7 +39,7 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     tar xf v$MASTO_VER.tar.gz && \
     wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff && \
     patch -s -p0 < patchset.diff && \
-    mv mastodon-2.3.3 mastodon && \
+    mv mastodon-$MASTO_VER mastodon && \
     rm v$MASTO_VER.tar.gz && \
     cd mastodon && \
     gem install bundler && \
