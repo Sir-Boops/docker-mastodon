@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 ENV MASTO_VER="2.4.0rc1"
-ENV RUBY_VER="2.5.0"
+ENV RUBY_VER="2.5.1"
 
 RUN apt update && \
     apt -y install whois && \
@@ -35,6 +35,7 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     RUBY_CONFIGURE_OPTS="--with-jemalloc" rbenv install $RUBY_VER && \
     rbenv global $RUBY_VER && \
     export PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" && \
+    echo PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" >> ~/.bash_profile && \
     wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz && \
     tar xf v$MASTO_VER.tar.gz && \
     wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff && \
