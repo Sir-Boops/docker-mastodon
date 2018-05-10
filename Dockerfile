@@ -46,5 +46,3 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     gem install bundler && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile
-
-USER root
