@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-ENV MASTO_VER="2.4.0rc2"
+ENV MASTO_HASH="8756fd1e8231ff57c4249fa900b7a5d5f9005178"
 ENV RUBY_VER="2.5.1"
 
 # Create the mastodon user
@@ -39,13 +39,9 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     rbenv global $RUBY_VER && \
     export PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" && \
     echo PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" >> ~/.bash_profile && \
-    wget https://github.com/tootsuite/mastodon/archive/v$MASTO_VER.tar.gz && \
-    tar xf v$MASTO_VER.tar.gz && \
-    wget https://git.sergal.org/Sir-Boops/mastodon-patches/raw/branch/master/patchset.diff && \
-    patch -s -p0 < patchset.diff && \
-    mv mastodon-$MASTO_VER mastodon && \
-    rm v$MASTO_VER.tar.gz && \
+    git clone https://github.com/tootsuite/mastodon && \
     cd mastodon && \
+    git checkout $MASTO_HASH && \
     gem install bundler && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile
