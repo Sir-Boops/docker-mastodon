@@ -1,13 +1,15 @@
 FROM ubuntu:16.04
 
-ENV MASTO_VER="2.4.0rc1"
+ENV MASTO_VER="2.4.0rc2"
 ENV RUBY_VER="2.5.1"
 
+# Create the mastodon user
 RUN apt update && \
-    apt -y install whois && \
+    apt install -y whois && \
     useradd -m -d /opt/mastodon mastodon && \
     echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
+# Setup the base system
 RUN apt update && \
     apt -y dist-upgrade && \
     apt -y install curl wget && \
@@ -21,6 +23,7 @@ RUN apt update && \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 \
         libgdbm-dev redis-tools postgresql-contrib yarn libidn11-dev libicu-dev libjemalloc-dev
 
+# Install ruby and build mastodon and all deps for the user
 USER mastodon
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     cd ~/.rbenv && \
