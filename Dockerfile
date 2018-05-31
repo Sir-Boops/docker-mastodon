@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-ENV MASTO_HASH="4d81809f36fcbfe787e23d490f2cb0ad943ab32c"
+ENV MASTO_HASH="ad40bf5e0c77baacbeda248ccca8d310e786ff61"
 ENV RUBY_VER="2.5.1"
 
 # Create the mastodon user
