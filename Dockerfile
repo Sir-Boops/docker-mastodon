@@ -1,7 +1,11 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 ENV MASTO_HASH="35ae9601228fcc91eadcea6f486097eea4275873"
 ENV RUBY_VER="2.5.1"
+ENV NODE_VER="6.14.2"
+
+# Use bash for the shell
+SHELL ["bash", "-c"]
 
 # Create the mastodon user
 RUN apt update && \
@@ -12,18 +16,20 @@ RUN apt update && \
 # Setup the base system
 RUN apt update && \
     apt -y dist-upgrade && \
-    apt -y install curl wget && \
-    curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+    apt -y install curl gnupg2 && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
+    echo "Etc/UTC" > /etc/localtime && \
     apt update && \
+    apt install --no-install-recommends yarn && \
     apt -y install imagemagick ffmpeg libpq-dev libxml2-dev libxslt1-dev \
-        file git-core g++ libprotobuf-dev protobuf-compiler pkg-config nodejs \
+        file git-core g++ libprotobuf-dev protobuf-compiler pkg-config \
         gcc autoconf bison build-essential libssl-dev libyaml-dev \
-        libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 \
-        libgdbm-dev redis-tools postgresql-contrib yarn libidn11-dev libicu-dev libjemalloc-dev
+        libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 \
+        libgdbm-dev redis-tools postgresql-contrib libidn11-dev libicu-dev \
+        libjemalloc-dev python
 
-# Install ruby and build mastodon and all deps for the user
+# Install ruby,node and build mastodon and all deps for the user
 USER mastodon
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     cd ~/.rbenv && \
@@ -32,8 +38,12 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     cd ~ && \
     echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile && \
     echo 'eval "$(rbenv init -)"' >> ~/.bash_profile && \
-    export PATH="$HOME/.rbenv/bin:$PATH" && \
-    rbenv init - && \
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && \
+    echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile && \
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile && \
+    source ~/.bash_profile && \
+    nvm install $NODE_VER && \
+    nvm use $NODE_VER && \
     git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
     RUBY_CONFIGURE_OPTS="--with-jemalloc" rbenv install $RUBY_VER && \
     rbenv global $RUBY_VER && \
