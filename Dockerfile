@@ -52,8 +52,6 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     git clone https://github.com/tootsuite/mastodon && \
     cd mastodon && \
     git checkout $MASTO_HASH && \
-    echo "Rails.application.config.session_store :cookie_store, key: '_mastodon_session', secure: (ENV['LOCAL_HTTPS'] == 'false')" \
-    > config/initializers/session_store.rb && \
     gem install bundler && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile
