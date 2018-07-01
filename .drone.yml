@@ -4,6 +4,6 @@ pipeline:
         dockerfile: Dockerfile
         repo: sirboops/mastodon
         tags: [2.4.2, latest]
-        daemon.experimental: true
+        experimental: true
         squash: true
         secrets: [ docker_username, docker_password ]
