@@ -59,3 +59,5 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
 
 USER root
 RUN apt -y remove *-dev
+
+USER mastodon
