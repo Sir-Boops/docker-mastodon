@@ -54,4 +54,5 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     git checkout $MASTO_HASH && \
     gem install bundler && \
     bundle install -j$(nproc) --deployment --without development test && \
-    yarn install --pure-lockfile
+    yarn install --pure-lockfile && \
+    rm -rf .git
