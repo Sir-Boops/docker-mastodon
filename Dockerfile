@@ -7,16 +7,9 @@ ENV NODE_VER="6.14.2"
 # Use bash for the shell
 SHELL ["bash", "-c"]
 
-# Create the mastodon user
-RUN apt update && \
-    apt install -y whois && \
-    useradd -m -d /opt/mastodon mastodon && \
-    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
-
-# Setup the base system
 RUN apt update && \
     apt -y dist-upgrade && \
-    apt -y install curl gnupg2 && \
+    apt -y install curl gnupg2 whois && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
     echo "Etc/UTC" > /etc/localtime && \
@@ -28,8 +21,12 @@ RUN apt update && \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 \
         libgdbm-dev redis-tools postgresql-contrib libidn11-dev libicu-dev \
         libjemalloc-dev python && \
-    su -s /bin/bash mastodon && \
-    cd ~ && \
+    useradd -m -d /opt/mastodon mastodon && \
+    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
+
+USER mastodon
+
+RUN cd ~ && \
     git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     cd ~/.rbenv && \
     src/configure && \
@@ -55,5 +52,12 @@ RUN apt update && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile && \
     rm -rf .git
+
+USER root
+
+RUN cd ~ && \
+    rm -rf /usr/local/share/.cache/ && \
+    apt -y remove $(dpkg-query -f '${binary:Package}\n' -W '*-dev') && \
+    apt -y auto-remove
 
 USER mastodon
