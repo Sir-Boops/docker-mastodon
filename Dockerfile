@@ -27,11 +27,10 @@ RUN apt update && \
         gcc autoconf bison build-essential libssl-dev libyaml-dev \
         libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 \
         libgdbm-dev redis-tools postgresql-contrib libidn11-dev libicu-dev \
-        libjemalloc-dev python
-
-# Install ruby,node and build mastodon and all deps for the user
-USER mastodon
-RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
+        libjemalloc-dev python && \
+    su -s /bin/bash mastodon && \
+    cd ~ && \
+    git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     cd ~/.rbenv && \
     src/configure && \
     make -C src && \
@@ -56,8 +55,5 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile && \
     rm -rf .git
-
-USER root
-RUN apt -y remove *-dev
 
 USER mastodon
