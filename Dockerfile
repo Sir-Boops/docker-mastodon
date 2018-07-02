@@ -25,7 +25,7 @@ RUN apk --no-cache --virtual deps add \
     ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
       ./configure --prefix=/opt/ruby \
         --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-        --disable-install-doc \
+        --disable-install-doc && \
     make -j$(nproc) && \
     make install && \
     rm -rf /opt/ruby/share && \
