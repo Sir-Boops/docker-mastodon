@@ -31,13 +31,14 @@ RUN apk --no-cache --virtual deps add \
 # Build and install ruby lang
 RUN apk --no-cache --virtual deps add \
       gcc g++ make linux-headers zlib-dev libressl-dev \
-      gdbm-dev db-dev readline-dev && \
+      gdbm-dev db-dev readline-dev dpkg dpkg-dev && \
     cd ~ && \
     wget https://cache.ruby-lang.org/pub/ruby/2.5/ruby-$RUBY_VER.tar.gz && \
     tar xf ruby-$RUBY_VER.tar.gz && \
     cd ruby-$RUBY_VER && \
     ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
       ./configure --prefix=/opt/ruby \
+        --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
         --disable-install-doc \
         --with-jemalloc=/opt/jemalloc/ && \
     make -j$(nproc) && \
