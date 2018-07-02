@@ -57,7 +57,6 @@ USER root
 
 RUN cd ~ && \
     rm -rf /usr/local/share/.cache/ && \
-    apt -y remove $(dpkg-query -f '${binary:Package}\n' -W '*-dev') && \
-    apt -y auto-remove
+    apt -y remove $(dpkg-query -f '${binary:Package}\n' -W '*-dev')
 
 USER mastodon
