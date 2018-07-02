@@ -14,20 +14,6 @@ RUN addgroup mastodon && \
     echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -m sha256`" | chpasswd && \
     apk -U --no-cache upgrade
 
-# Build JEMALLOC
-RUN apk --no-cache --virtual deps add \
-      autoconf gcc g++ make && \
-      cd ~ && \
-      wget https://github.com/jemalloc/jemalloc/archive/$JEMALLOC_VER.tar.gz && \
-      tar xf $JEMALLOC_VER.tar.gz && \
-      cd jemalloc-$JEMALLOC_VER && \
-      ./autogen.sh && \
-      ./configure --prefix=/opt/jemalloc && \
-      make -j$(nproc) && \
-      make install_bin install_include install_lib && \
-      apk --purge del deps && \
-      rm -rf ~/*
-
 # Build and install ruby lang
 RUN apk --no-cache --virtual deps add \
       gcc g++ make linux-headers zlib-dev libressl-dev \
@@ -40,8 +26,7 @@ RUN apk --no-cache --virtual deps add \
       ./configure --prefix=/opt/ruby \
         --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
         --disable-install-doc \
-        --enable-shared \
-        --with-jemalloc=/opt/jemalloc/ && \
+        --enable-shared && \
     make -j$(nproc) && \
     make install && \
     rm -rf /opt/ruby/share && \
