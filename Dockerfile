@@ -14,6 +14,20 @@ RUN addgroup mastodon && \
     echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -m sha256`" | chpasswd && \
     apk -U --no-cache upgrade
 
+# Build and install NODEJS
+RUN apk --no-cache --virtual deps add \
+      python make gcc g++ linux-headers && \
+    apk add libstdc++ && \
+    cd ~ && \
+    wget https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER.tar.xz && \
+    tar xf node-v$NODE_VER.tar.xz && \
+    cd node-v$NODE_VER && \
+    ./configure --prefix=/opt/node && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf ~/* && \
+    apk --purge del deps
+
 # Build JEMALLOC
 RUN apk --no-cache --virtual deps add \
       autoconf gcc g++ make && \
@@ -48,22 +62,8 @@ RUN apk --no-cache --virtual deps add \
     rm -rf ~/* && \
     apk --purge del deps
 
-# Build and install NODEJS
-RUN apk --no-cache --virtual deps add \
-      python make gcc g++ linux-headers && \
-    apk add libstdc++ && \
-    cd ~ && \
-    wget https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER.tar.xz && \
-    tar xf node-v$NODE_VER.tar.xz && \
-    cd node-v$NODE_VER && \
-    ./configure --prefix=/opt/nodejs && \
-    make -j$(nproc) && \
-    make install && \
-    rm -rf ~/* && \
-    apk --purge del deps
-
 # Set the proper PATH
-ENV PATH="${PATH}:/opt/nodejs/bin:/opt/ruby/bin"
+ENV PATH="${PATH}:/opt/node/bin:/opt/ruby/bin"
 
 # Install masto deps
 RUN npm install -g yarn && \
