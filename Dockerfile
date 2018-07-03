@@ -29,7 +29,6 @@ RUN apk --no-cache --virtual deps add \
     rm -rf ~/*
 
 # Build and install ruby lang
-COPY ./*.patch /root/
 RUN apk --no-cache --virtual deps add \
       gcc g++ make linux-headers zlib-dev libressl-dev \
       gdbm-dev db-dev readline-dev dpkg dpkg-dev && \
