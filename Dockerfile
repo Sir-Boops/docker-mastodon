@@ -1,7 +1,7 @@
 FROM alpine:3.7
 
 ENV JEMALLOC_VER="5.1.0"
-ENV RUBY_VER="2.4.4"
+ENV RUBY_VER="2.5.1"
 ENV NODE_VER="6.14.3"
 ENV MASTO_HASH="2a1089839db64ceb2e9f9d3d62217da3812d3ad0"
 
@@ -15,12 +15,14 @@ RUN addgroup mastodon && \
     apk -U --no-cache upgrade
 
 # Build and install ruby lang
+COPY ./fix-get_main_stack.patch /root/
 RUN apk --no-cache --virtual deps add \
       gcc g++ make linux-headers zlib-dev libressl-dev \
       gdbm-dev db-dev readline-dev dpkg dpkg-dev && \
     cd ~ && \
-    wget https://cache.ruby-lang.org/pub/ruby/2.4/ruby-$RUBY_VER.tar.gz && \
+    wget https://cache.ruby-lang.org/pub/ruby/2.5/ruby-$RUBY_VER.tar.gz && \
     tar xf ruby-$RUBY_VER.tar.gz && \
+    patch ruby-$RUBY_VER/thread_pthread.c fix-get_main_stack.patch && \
     cd ruby-$RUBY_VER && \
     ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
       ./configure --prefix=/opt/ruby \
