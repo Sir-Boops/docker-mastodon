@@ -65,6 +65,7 @@ COPY --from=build-dep /opt/jemalloc /opt/jemalloc
 COPY --from=build-dep /opt/ruby /opt/ruby
 
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
+ENV TINI_VERSION="0.18.0"
 
 # Create the mastodon user
 RUN apt update && \
@@ -79,7 +80,18 @@ COPY --from=build-dep --chown=1000:1000 /opt/mastodon /opt/mastodon
 RUN apt -y --no-install-recommends install \
       libssl1.1 libpq5 imagemagick ffmpeg \
       libicu60 libprotobuf10 libidn11 \
-      file ca-certificates tzdata && \
+      file ca-certificates tzdata \
+      gpg dirmngr gpg-agent && \
     gem install bundler
 
+# Add and verify tini
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini /tini
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini.asc /tini.asc
+RUN gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 \
+      --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 && \
+    gpg --verify /tini.asc
+RUN chmod +x /tini
+
 USER mastodon
+WORKDIR /opt/mastodon
+ENTRYPOINT ["/tini", "--"]
