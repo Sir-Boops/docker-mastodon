@@ -82,6 +82,7 @@ RUN apt -y --no-install-recommends install \
       libicu60 libprotobuf10 libidn11 \
       file ca-certificates tzdata \
       gpg dirmngr gpg-agent && \
+    ln -s /opt/mastodon /mastodon && \
     gem install bundler
 
 # Add and verify tini
