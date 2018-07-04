@@ -1,63 +1,83 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 as build-dep
 
 ENV MASTO_HASH="2a1089839db64ceb2e9f9d3d62217da3812d3ad0"
+ENV NODE_VER="6.14.3"
+ENV JEMALLOC_VER="5.1.0"
 ENV RUBY_VER="2.5.1"
-ENV NODE_VER="6.14.2"
 
 # Use bash for the shell
 SHELL ["bash", "-c"]
 
-# Create the mastodon user
+# Install Node
 RUN apt update && \
-    apt install -y whois && \
-    useradd -m -d /opt/mastodon mastodon && \
-    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
-
-# Setup the base system
-RUN apt update && \
-    apt -y dist-upgrade && \
-    apt -y install curl gnupg2 && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
     echo "Etc/UTC" > /etc/localtime && \
-    apt update && \
-    apt install --no-install-recommends yarn && \
-    apt -y install imagemagick ffmpeg libpq-dev libxml2-dev libxslt1-dev \
-        file git-core g++ libprotobuf-dev protobuf-compiler pkg-config \
-        gcc autoconf bison build-essential libssl-dev libyaml-dev \
-        libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 \
-        libgdbm-dev redis-tools postgresql-contrib libidn11-dev libicu-dev \
-        libjemalloc-dev python
-
-# Install ruby,node and build mastodon and all deps for the user
-USER mastodon
-RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
-    cd ~/.rbenv && \
-    src/configure && \
-    make -C src && \
+    apt -y dist-upgrade && \
+    apt -y install wget make gcc g++ python && \
     cd ~ && \
-    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile && \
-    echo 'eval "$(rbenv init -)"' >> ~/.bash_profile && \
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && \
-    echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile && \
-    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile && \
-    source ~/.bash_profile && \
-    nvm install $NODE_VER && \
-    nvm use $NODE_VER && \
-    git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
-    RUBY_CONFIGURE_OPTS="--with-jemalloc" rbenv install $RUBY_VER && \
-    rbenv global $RUBY_VER && \
-    export PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" && \
-    echo PATH="$HOME/.rbenv/versions/$RUBY_VER/bin:$PATH" >> ~/.bash_profile && \
-    git clone https://github.com/tootsuite/mastodon && \
-    cd mastodon && \
+    wget https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER.tar.gz && \
+    tar xf node-v$NODE_VER.tar.gz && \
+    cd node-v$NODE_VER && \
+    ./configure --prefix=/opt/node && \
+    make -j$(nproc) && \
+    make install
+
+RUN apt -y install autoconf && \
+    cd ~ && \
+    wget https://github.com/jemalloc/jemalloc/archive/$JEMALLOC_VER.tar.gz && \
+    tar xf $JEMALLOC_VER.tar.gz && \
+    cd jemalloc-$JEMALLOC_VER && \
+    ./autogen.sh && \
+    ./configure --prefix=/opt/jemalloc && \
+    make -j$(nproc) && \
+    make install_bin install_include install_lib
+
+RUN apt -y install zlib1g-dev libssl-dev \
+      libgdbm-dev libdb-dev libreadline-dev && \
+    cd ~ && \
+    wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.gz && \
+    tar xf ruby-$RUBY_VER.tar.gz && \
+    cd ruby-$RUBY_VER && \
+    ./configure --prefix=/opt/ruby \
+      --with-jemalloc=/opt/jemalloc \
+      --with-shared \
+      --disable-install-doc && \
+    make -j$(nproc) && \
+    make install
+
+ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
+
+RUN npm install -g yarn && \
+    gem install bundler
+
+RUN apt -y install git libicu-dev libidn11-dev \
+    libpq-dev libprotobuf-dev protobuf-compiler && \
+    git clone https://github.com/tootsuite/mastodon /opt/mastodon && \
+    cd /opt/mastodon && \
     git checkout $MASTO_HASH && \
-    gem install bundler && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile && \
     rm -rf .git
 
-USER root
-RUN apt -y remove *-dev
+FROM ubuntu:18.04
 
-USER mastodon
+COPY --from=build-dep /opt/node /opt/node
+COPY --from=build-dep /opt/jemalloc /opt/jemalloc
+COPY --from=build-dep /opt/ruby /opt/ruby
+
+ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
+
+# Create the mastodon user
+RUN apt update && \
+    echo "Etc/UTC" > /etc/localtime && \
+    apt -y dist-upgrade && \
+    apt install -y whois && \
+    useradd -m -d /opt/mastodon mastodon && \
+    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
+
+COPY --from=build-dep --chown=1000:1000 /opt/mastodon /opt/mastodon
+
+RUN apt -y --no-install-recommends install \
+      libssl1.1 libpq5 imagemagick ffmpeg \
+      libicu60 libprotobuf10 libidn11 \
+      file ca-certificates tzdata && \
+    gem install bundler
