@@ -81,3 +81,5 @@ RUN apt -y --no-install-recommends install \
       libicu60 libprotobuf10 libidn11 \
       file ca-certificates tzdata && \
     gem install bundler
+
+USER mastodon
