@@ -80,17 +80,14 @@ COPY --from=build-dep --chown=1000:1000 /opt/mastodon /opt/mastodon
 RUN apt -y --no-install-recommends install \
       libssl1.1 libpq5 imagemagick ffmpeg \
       libicu60 libprotobuf10 libidn11 \
-      file ca-certificates tzdata \
-      gpg dirmngr gpg-agent && \
+      file ca-certificates tzdata && \
     ln -s /opt/mastodon /mastodon && \
     gem install bundler
 
-# Add and verify tini
+# Add tini
+ENV TINI_SUM="12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855"
 ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini /tini
-ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini.asc /tini.asc
-RUN gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 \
-      --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 && \
-    gpg --verify /tini.asc
+RUN echo "$TINI_SUM tini" | sha256sum -c -
 RUN chmod +x /tini
 
 USER mastodon
