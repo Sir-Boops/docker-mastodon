@@ -1,4 +1,4 @@
-TAGS="2.4.2 latest"
+TAGS="2.4.3rc1 latest"
 DOCKER_REPO="sirboops/mastodon"
 
 BUILD_TAGS=""
