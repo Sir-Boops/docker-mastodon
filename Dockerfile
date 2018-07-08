@@ -65,7 +65,7 @@ COPY --from=build-dep /opt/node /opt/node
 COPY --from=build-dep /opt/jemalloc /opt/jemalloc
 COPY --from=build-dep /opt/ruby /opt/ruby
 
-ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
+ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 ENV TINI_VERSION="0.18.0"
 
 # Create the mastodon user
@@ -84,6 +84,10 @@ RUN apt -y --no-install-recommends install \
       file ca-certificates tzdata && \
     ln -s /opt/mastodon /mastodon && \
     gem install bundler
+
+# Clean up more dirs
+RUN rm -rf /var/cache && \
+    rm -rf /var/apt
 
 # Add tini
 ENV TINI_SUM="12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855"
