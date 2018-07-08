@@ -1,14 +1,10 @@
 FROM ubuntu:18.04 as build-dep
 
-ENV MASTO_HASH="f89c595ea070d2017adb868fb5e311e198d8e990"
-ENV NODE_VER="6.14.3"
-ENV JEMALLOC_VER="5.1.0"
-ENV RUBY_VER="2.5.1"
-
 # Use bash for the shell
 SHELL ["bash", "-c"]
 
 # Install Node
+ENV NODE_VER="6.14.3"
 RUN apt update && \
     echo "Etc/UTC" > /etc/localtime && \
     apt -y dist-upgrade && \
@@ -21,6 +17,8 @@ RUN apt update && \
     make -j$(nproc) && \
     make install
 
+# Install jemalloc
+ENV JEMALLOC_VER="5.1.0"
 RUN apt -y install autoconf && \
     cd ~ && \
     wget https://github.com/jemalloc/jemalloc/archive/$JEMALLOC_VER.tar.gz && \
@@ -31,6 +29,8 @@ RUN apt -y install autoconf && \
     make -j$(nproc) && \
     make install_bin install_include install_lib
 
+# Install ruby
+ENV RUBY_VER="2.5.1"
 RUN apt -y install zlib1g-dev libssl-dev \
       libgdbm-dev libdb-dev libreadline-dev && \
     cd ~ && \
@@ -49,6 +49,7 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 RUN npm install -g yarn && \
     gem install bundler
 
+ENV MASTO_HASH="451e585b9720c61ef9a155a16484b25ded79d512"
 RUN apt -y install git libicu-dev libidn11-dev \
     libpq-dev libprotobuf-dev protobuf-compiler && \
     git clone https://github.com/tootsuite/mastodon /opt/mastodon && \
