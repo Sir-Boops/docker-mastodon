@@ -38,7 +38,6 @@ RUN apt -y install zlib1g-dev libssl-dev \
     tar xf ruby-$RUBY_VER.tar.gz && \
     cd ruby-$RUBY_VER && \
     ./configure --prefix=/opt/ruby \
-      --with-jemalloc=/opt/jemalloc \
       --with-shared \
       --disable-install-doc && \
     make -j$(nproc) && \
