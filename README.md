@@ -1,6 +1,6 @@
 # Mastodon docker image
 
-This /is/ a drop-in replacement for the official mastodon docker image.
+This is a drop-in replacement for the official mastodon docker image.
 
 So then...why make this?
 
