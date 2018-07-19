@@ -11,7 +11,7 @@ done
 
 
 # Build the image
-docker build $BUILD_TAGS . --squash
+docker build $BUILD_TAGS . --squash --no-cache
 
 
 # Upload the images
