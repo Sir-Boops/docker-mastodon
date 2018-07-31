@@ -1,0 +1,9 @@
+pipeline:
+    docker:
+        image: plugins/docker
+        dockerfile: Dockerfile
+        repo: sirboops/mastodon
+        tags: [2.4.3, latest]
+        experimental: true
+        squash: true
+        secrets: [ docker_username, docker_password ]
