@@ -65,6 +65,7 @@ FROM ubuntu:18.04
 
 COPY --from=build-dep /opt/node /opt/node
 COPY --from=build-dep /opt/ruby /opt/ruby
+COPY --from=build-dep /opt/jemalloc /opt/jemalloc
 
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 ENV TINI_VERSION="0.18.0"
