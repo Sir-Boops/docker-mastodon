@@ -26,7 +26,6 @@ RUN apt -y install autoconf && \
 	cd jemalloc-$JE_VER && \
 	./autogen.sh && \
 	./configure --prefix=/opt/jemalloc \
-		--disable-cache-oblivious \
 		--disable-fill --disable-stats && \
 	make -j$(nproc) && \
 	make install_bin install_include install_lib
