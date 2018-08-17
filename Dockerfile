@@ -4,7 +4,7 @@ FROM ubuntu:18.04 as build-dep
 SHELL ["bash", "-c"]
 
 # Install Node
-ENV NODE_VER="6.14.3"
+ENV NODE_VER="6.14.4"
 RUN apt update && \
 	echo "Etc/UTC" > /etc/localtime && \
 	apt -y dist-upgrade && \
