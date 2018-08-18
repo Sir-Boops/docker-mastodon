@@ -78,7 +78,8 @@ RUN apt update && \
 	ln -s /opt/jemalloc/lib/* /usr/lib/ && \
 	apt -y dist-upgrade && \
 	apt install -y whois && \
-	useradd -m -d /opt/mastodon mastodon && \
+	addgroup --gid 991 mastodon && \
+	useradd -m -u 991 -g 991 -d /opt/mastodon mastodon && \
 	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
 COPY --from=build-dep --chown=1000:1000 /opt/mastodon /opt/mastodon
