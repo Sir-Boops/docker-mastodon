@@ -5,8 +5,8 @@ SHELL ["bash", "-c"]
 
 # Install Node
 ENV NODE_VER="6.14.4"
-RUN apt update && \
-	echo "Etc/UTC" > /etc/localtime && \
+RUN echo "Etc/UTC" > /etc/localtime && \
+	apt update && \
 	apt -y dist-upgrade && \
 	apt -y install wget make gcc g++ python && \
 	cd ~ && \
@@ -32,6 +32,8 @@ RUN apt -y install autoconf && \
 
 # Install ruby
 ENV RUBY_VER="2.5.1"
+ENV CPPFLAGS="-I/opt/jemalloc/include"
+ENV LDFLAGS="-L/opt/jemalloc/lib/"
 RUN apt -y install zlib1g-dev libssl-dev \
 	  libgdbm-dev libdb-dev libreadline-dev && \
 	cd ~ && \
@@ -39,9 +41,10 @@ RUN apt -y install zlib1g-dev libssl-dev \
 	tar xf ruby-$RUBY_VER.tar.gz && \
 	cd ruby-$RUBY_VER && \
 	./configure --prefix=/opt/ruby \
-	  --with-jemalloc=/opt/jemalloc \
+	  --with-jemalloc \
 	  --with-shared \
 	  --disable-install-doc && \
+	ln -s /opt/jemalloc/lib/* /usr/lib/ && \
 	make -j$(nproc) && \
 	make install
 
@@ -72,6 +75,7 @@ ENV TINI_VERSION="0.18.0"
 # Create the mastodon user
 RUN apt update && \
 	echo "Etc/UTC" > /etc/localtime && \
+	ln -s /opt/jemalloc/lib/* /usr/lib/ && \
 	apt -y dist-upgrade && \
 	apt install -y whois && \
 	useradd -m -d /opt/mastodon mastodon && \
