@@ -82,7 +82,7 @@ RUN apt update && \
 	useradd -m -u 991 -g 991 -d /opt/mastodon mastodon && \
 	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
-COPY --from=build-dep --chown=1000:1000 /opt/mastodon /opt/mastodon
+COPY --from=build-dep --chown=991:991 /opt/mastodon /opt/mastodon
 
 RUN apt -y --no-install-recommends install \
 	  libssl1.1 libpq5 imagemagick ffmpeg \
