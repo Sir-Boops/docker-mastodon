@@ -104,6 +104,9 @@ RUN chmod +x /tini
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
+# Tell rails to serve static files
+ENV RAILS_SERVE_STATIC_FILES="true"
+
 USER mastodon
 WORKDIR /opt/mastodon
 ENTRYPOINT ["/tini", "--"]
