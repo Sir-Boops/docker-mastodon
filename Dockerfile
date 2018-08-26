@@ -4,7 +4,7 @@ FROM ubuntu:18.04 as build-dep
 SHELL ["bash", "-c"]
 
 # Install Node
-ENV NODE_VER="6.14.4"
+ENV NODE_VER="8.11.4"
 RUN	echo "Etc/UTC" > /etc/localtime && \
 	apt update && \
 	apt -y dist-upgrade && \
@@ -52,7 +52,7 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 RUN npm install -g yarn && \
 	gem install bundler
 
-ENV MASTO_HASH="add3b63a0c84dbad936c461ae2617b1f995fe85b"
+ENV MASTO_HASH="b31449cd778f9a8639427929f060dee44646bc7d"
 RUN apt -y install git libicu-dev libidn11-dev \
 	libpq-dev libprotobuf-dev protobuf-compiler && \
 	git clone https://github.com/tootsuite/mastodon /opt/mastodon && \
