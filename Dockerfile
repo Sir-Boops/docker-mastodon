@@ -64,12 +64,13 @@ RUN apt -y install git libicu-dev libidn11-dev \
 
 FROM ubuntu:18.04
 
+# Copy over all the langs needed for runtime
 COPY --from=build-dep /opt/node /opt/node
 COPY --from=build-dep /opt/ruby /opt/ruby
 COPY --from=build-dep /opt/jemalloc /opt/jemalloc
 
+# Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
-ENV TINI_VERSION="0.18.0"
 
 # Create the mastodon user
 RUN apt update && \
@@ -81,8 +82,10 @@ RUN apt update && \
 	useradd -m -u 991 -g 991 -d /opt/mastodon mastodon && \
 	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
+# Copy over masto source from building and set permissions
 COPY --from=build-dep --chown=991:991 /opt/mastodon /opt/mastodon
 
+# Install masto runtime deps
 RUN apt -y --no-install-recommends install \
 	  libssl1.1 libpq5 imagemagick ffmpeg \
 	  libicu60 libprotobuf10 libidn11 \
@@ -95,18 +98,27 @@ RUN rm -rf /var/cache && \
 	rm -rf /var/apt
 
 # Add tini
+ENV TINI_VERSION="0.18.0"
 ENV TINI_SUM="12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855"
 ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini /tini
 RUN echo "$TINI_SUM tini" | sha256sum -c -
 RUN chmod +x /tini
 
-# Run in prod mode
+# Run masto services in prod mode
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
 # Tell rails to serve static files
 ENV RAILS_SERVE_STATIC_FILES="true"
 
+# Set the run user
 USER mastodon
+
+# Precompile assets
+RUN cd ~ && \
+	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
+	yarn cache clean
+
+# Set the work dir and the container entry point
 WORKDIR /opt/mastodon
 ENTRYPOINT ["/tini", "--"]
