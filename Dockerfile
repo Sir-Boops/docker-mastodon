@@ -30,7 +30,7 @@ RUN apt -y install autoconf && \
 	make install_bin install_include install_lib
 
 # Install ruby
-ENV RUBY_VER="2.5.1"
+ENV RUBY_VER="2.5.3"
 ENV CPPFLAGS="-I/opt/jemalloc/include"
 ENV LDFLAGS="-L/opt/jemalloc/lib/"
 RUN apt -y install zlib1g-dev libssl-dev \
@@ -52,7 +52,7 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 RUN npm install -g yarn && \
 	gem install bundler
 
-ENV MASTO_HASH="e8a4ba49cfda3b7461fe349266a6ea479e667bf5"
+ENV MASTO_HASH="f468bfb83004bf9b688cdcec5da41453e0390a3f"
 RUN apt -y install git libicu-dev libidn11-dev \
 	libpq-dev libprotobuf-dev protobuf-compiler && \
 	git clone https://github.com/tootsuite/mastodon /opt/mastodon && \
