@@ -50,7 +50,7 @@ RUN apt -y install zlib1g-dev libssl-dev \
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 
 RUN npm install -g yarn && \
-	gem install bundler
+	gem install bundler -v 1.17.3
 
 ENV MASTO_HASH="15aed1ee6c97b428c564e370cff77a158842a612"
 RUN apt -y install git libicu-dev libidn11-dev \
