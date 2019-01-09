@@ -65,8 +65,7 @@ RUN cd ~ && \
     git checkout $MASTO_HASH && \
     bundle install -j$(nproc) --deployment --without development test && \
     yarn install --pure-lockfile && \
-    rm -rf ~/.cache && \
-    rm -rf ~/mastodon/.git
+    rm -rf .git
 
 USER root
 
