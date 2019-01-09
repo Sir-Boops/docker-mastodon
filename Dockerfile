@@ -33,7 +33,7 @@ RUN apk --no-cache --virtual deps add \
     cd jemalloc-$JEMALLOC_VER && \
     ./autogen.sh && \
     ./configure --prefix=/opt/jemalloc && \
-    make -j$(nproc) && \
+    make -j$(nproc) > /dev/null && \
     make install_bin install_include install_lib && \
     rm -rf ~/*
 
@@ -56,7 +56,8 @@ RUN apk --no-cache --virtual deps add \
         --disable-install-doc \
         --with-jemalloc=/opt/jemalloc/ \
         --enable-shared && \
-    make -j$(nproc) && \
+	ln -s /opt/jemalloc/lib/* /usr/lib/ && \
+    make -j$(nproc) > /dev/null && \
     make install && \
     rm -rf /opt/ruby/share && \
     rm -rf ~/*
