@@ -23,24 +23,8 @@ RUN apk --no-cache --virtual deps add \
     make install && \
     rm -rf ~/*
 
-# Build JEMALLOC
-ENV JEMALLOC_VER="5.1.0"
-RUN apk --no-cache --virtual deps add \
-      autoconf gcc g++ make && \
-    cd ~ && \
-    wget https://github.com/jemalloc/jemalloc/archive/$JEMALLOC_VER.tar.gz && \
-    tar xf $JEMALLOC_VER.tar.gz && \
-    cd jemalloc-$JEMALLOC_VER && \
-    ./autogen.sh && \
-    ./configure --prefix=/opt/jemalloc && \
-    make -j$(nproc) > /dev/null && \
-    make install_bin install_include install_lib && \
-    rm -rf ~/*
-
 # Build and install ruby lang
 ENV RUBY_VER="2.6.0"
-ENV CPPFLAGS="-I/opt/jemalloc/include"
-ENV LDFLAGS="-L/opt/jemalloc/lib/"
 RUN apk --no-cache --virtual deps add \
       gcc g++ make linux-headers zlib-dev libressl-dev \
       gdbm-dev db-dev readline-dev dpkg dpkg-dev patch && \
@@ -56,7 +40,6 @@ RUN apk --no-cache --virtual deps add \
         --disable-install-doc \
         --with-jemalloc=/opt/jemalloc/ \
         --enable-shared && \
-	ln -s /opt/jemalloc/lib/* /usr/lib/ && \
     make -j$(nproc) > /dev/null && \
     make install && \
     rm -rf /opt/ruby/share && \
