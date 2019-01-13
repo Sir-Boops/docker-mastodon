@@ -1,3 +1,5 @@
+FROM sirboops/nodejs:8.15.0-alpine as node
+FROM sirboops/ruby:2.6.0-alpine as ruby
 FROM alpine:3.8
 
 # Use ash for the shell
@@ -9,41 +11,12 @@ RUN addgroup -g 991 mastodon && \
     adduser -u 991 -S -D -h /opt/mastodon -G mastodon mastodon && \
     apk -U --no-cache upgrade
 
-# Build and install NODEJS
-ENV NODE_VER="8.15.0"
-RUN apk --no-cache --virtual deps add \
-      python make gcc g++ linux-headers && \
-    apk add libstdc++ && \
-    cd ~ && \
-    wget https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER.tar.xz && \
-    tar xf node-v$NODE_VER.tar.xz && \
-    cd node-v$NODE_VER && \
-    ./configure --prefix=/opt/node && \
-    make -j$(nproc) > /dev/null && \
-    make install && \
-    rm -rf ~/*
+# Install nodejs
+COPY --from=node /opt/node/ /opt/node/
+RUN apk add libstdc++
 
-# Build and install ruby lang
-ENV RUBY_VER="2.6.0"
-RUN apk --no-cache --virtual deps add \
-      gcc g++ make linux-headers zlib-dev libressl-dev \
-      gdbm-dev db-dev readline-dev dpkg dpkg-dev patch && \
-    cd ~ && \
-    wget https://cache.ruby-lang.org/pub/ruby/${RUBY_VER%.*}/ruby-$RUBY_VER.tar.gz && \
-    tar xf ruby-$RUBY_VER.tar.gz && \
-    cd ruby-$RUBY_VER && \
-	wget -O 'thread-stack-fix.patch' 'https://bugs.ruby-lang.org/attachments/download/7081/0001-thread_pthread.c-make-get_main_stack-portable-on-lin.patch' && \
-	patch -p1 -i thread-stack-fix.patch && \
-    ac_cv_func_isnan=yes ac_cv_func_isinf=yes \
-      ./configure --prefix=/opt/ruby \
-        --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-        --disable-install-doc \
-        --with-jemalloc=/opt/jemalloc/ \
-        --enable-shared && \
-    make -j$(nproc) > /dev/null && \
-    make install && \
-    rm -rf /opt/ruby/share && \
-    rm -rf ~/*
+# Install Ruby
+COPY --from=ruby /opt/ruby/ /opt/ruby/
 
 # Set the proper PATH
 ENV PATH="${PATH}:/opt/node/bin:/opt/ruby/bin"
@@ -56,6 +29,7 @@ RUN npm install -g yarn && \
       postgresql-dev libidn-dev protobuf-dev \
       python
 
+# Switch to masto user
 USER mastodon
 
 # Build and install Masto
@@ -67,6 +41,7 @@ RUN cd ~ && \
     yarn install --pure-lockfile && \
     rm -rf .git
 
+# Switch back to root user
 USER root
 
 # Set final path
