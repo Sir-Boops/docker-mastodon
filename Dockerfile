@@ -92,7 +92,7 @@ RUN apt -y --no-install-recommends install \
 	  file ca-certificates tzdata libreadline7 && \
 	apt -y install gcc && \
 	ln -s /opt/mastodon /mastodon && \
-	gem install bundler
+	gem install bundler -v 1.17.2
 
 # Clean up more dirs
 RUN rm -rf /var/cache && \
