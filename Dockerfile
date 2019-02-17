@@ -92,7 +92,7 @@ RUN apt -y --no-install-recommends install \
 	  file ca-certificates tzdata libreadline7 && \
 	apt -y install gcc && \
 	ln -s /opt/mastodon /mastodon && \
-	gem install bundler -v 1.17.2
+	gem install bundler
 
 # Clean up more dirs
 RUN rm -rf /var/cache && \
@@ -117,7 +117,7 @@ USER mastodon
 
 # Precompile assets
 RUN cd ~ && \
-	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
+	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile && \
 	yarn cache clean
 
 # Set the work dir and the container entry point
