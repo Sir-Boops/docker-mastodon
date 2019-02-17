@@ -1,5 +1,5 @@
 FROM sirboops/nodejs:8.15.0-alpine as node
-FROM sirboops/ruby:2.6.0-alpine as ruby
+FROM sirboops/ruby:2.6.1-alpine as ruby
 FROM alpine:3.8
 
 # Use ash for the shell
