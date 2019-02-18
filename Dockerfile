@@ -33,7 +33,7 @@ RUN npm install -g yarn && \
 USER mastodon
 
 # Build and install Masto
-ENV MASTO_HASH="28866d329bafe676ba2c45e3b449be3d1ba6e9ce"
+ENV MASTO_HASH="f3eb99aec3c2cd596c0b32fde9eff3be4579b22a"
 RUN cd ~ && \
     git clone https://github.com/tootsuite/mastodon . && \
     git checkout $MASTO_HASH && \
