@@ -50,9 +50,9 @@ RUN apt -y install zlib1g-dev libssl-dev \
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 
 RUN npm install -g yarn && \
-	gem install bundler -v 1.17.3
+	gem install bundler
 
-ENV MASTO_HASH="28866d329bafe676ba2c45e3b449be3d1ba6e9ce"
+ENV MASTO_HASH="f3eb99aec3c2cd596c0b32fde9eff3be4579b22a"
 RUN apt -y install git libicu-dev libidn11-dev \
 	libpq-dev libprotobuf-dev protobuf-compiler && \
 	git clone https://github.com/tootsuite/mastodon /opt/mastodon && \
@@ -117,7 +117,7 @@ USER mastodon
 
 # Precompile assets
 RUN cd ~ && \
-	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile && \
+	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
 	yarn cache clean
 
 # Set the work dir and the container entry point
