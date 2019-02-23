@@ -27,22 +27,23 @@ RUN apt update && \
 
 RUN apt -y install git libicu-dev libidn11-dev \
 		libpq-dev libprotobuf-dev protobuf-compiler && \
-	rm -rf /opt/mastodon && \
-	mkdir -p /opt/mastodon && \
 	npm install -g yarn && \
 	gem install bundler && \
-	chown mastodon:mastodon /opt/mastodon
+	rm -rf /opt/mastodon && \
+	mkdir -p /opt/mastodon && \
+	chown mastodon:mastodon /opt/mastodon && \
+	ln -s /opt/mastodon /mastodon
 
 USER mastodon
 
 ENV MASTO_HASH="f3eb99aec3c2cd596c0b32fde9eff3be4579b22a"
 
 RUN	cd ~ && \
-	git clone https://github.com/tootsuite/mastodon . && \
+	git clone https://github.com/tootsuite/mastodon.git . && \
 	git checkout $MASTO_HASH && \
+	rm -rf .git && \
 	bundle install -j$(nproc) --deployment --without development test && \
-	yarn install --pure-lockfile && \
-	rm -rf .git
+	yarn install --pure-lockfile
 
 USER root
 
@@ -55,8 +56,7 @@ RUN apt -y --no-install-recommends install \
 	  libssl1.1 libpq5 imagemagick ffmpeg \
 	  libicu60 libprotobuf10 libidn11 \
 	  file ca-certificates tzdata libreadline7 && \
-	apt -y install gcc && \
-	ln -s /opt/mastodon /mastodon
+	apt -y install gcc
 
 # Clean up more dirs
 RUN rm -rf /var/cache && \
