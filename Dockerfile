@@ -26,7 +26,8 @@ RUN apt update && \
 	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
 
 RUN apt -y install git libicu-dev libidn11-dev \
-		libpq-dev libprotobuf-dev protobuf-compiler && \
+		libpq-dev libprotobuf-dev protobuf-compiler \
+		libyaml && \
 	npm install -g yarn && \
 	gem install bundler && \
 	rm -rf /opt/mastodon && \
