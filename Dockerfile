@@ -27,7 +27,7 @@ RUN apt update && \
 
 RUN apt -y install git libicu-dev libidn11-dev \
 		libpq-dev libprotobuf-dev protobuf-compiler \
-		libyaml && \
+		libyaml-0-2 && \
 	npm install -g yarn && \
 	gem install bundler && \
 	rm -rf /opt/mastodon && \
