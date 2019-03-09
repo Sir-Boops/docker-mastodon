@@ -22,12 +22,12 @@ COPY --from=ruby /opt/ruby/ /opt/ruby/
 ENV PATH="${PATH}:/opt/node/bin:/opt/ruby/bin"
 
 # Install masto deps
-RUN npm install -g yarn && \
-    gem install bundler && \
-    apk --no-cache --virtual deps add \
+RUN	apk --no-cache --virtual deps add \
       git gcc g++ make zlib-dev icu-dev \
       postgresql-dev libidn-dev protobuf-dev \
-      python libressl
+      python && \
+	npm install -g yarn && \
+	gem install bundler
 
 # Switch to masto user
 USER mastodon
