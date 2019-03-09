@@ -27,7 +27,7 @@ RUN npm install -g yarn && \
     apk --no-cache --virtual deps add \
       git gcc g++ make zlib-dev icu-dev \
       postgresql-dev libidn-dev protobuf-dev \
-      python
+      python libressl-dev
 
 # Switch to masto user
 USER mastodon
