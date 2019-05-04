@@ -1,5 +1,5 @@
-FROM sirboops/nodejs:8.15.1 as node
-FROM sirboops/ruby:2.6.2 as ruby
+FROM sirboops/nodejs:8.16.0 as node
+FROM sirboops/ruby:2.6.3 as ruby
 FROM ubuntu:18.04
 
 # Use bash for the shell
@@ -37,7 +37,7 @@ RUN apt -y install git libicu-dev libidn11-dev \
 
 USER mastodon
 
-ENV MASTO_HASH="6afab2587de40d403e64724f6ae688b180de25d4"
+ENV MASTO_HASH="8025a41a1ff2ae1cd7c36a2baac36d3e2badb75d"
 
 RUN	cd ~ && \
 	git clone https://github.com/tootsuite/mastodon.git . && \
