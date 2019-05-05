@@ -37,7 +37,7 @@ RUN apt -y install git libicu-dev libidn11-dev \
 
 USER mastodon
 
-ENV MASTO_HASH="8025a41a1ff2ae1cd7c36a2baac36d3e2badb75d"
+ENV MASTO_HASH="2508370f44272719c24bd8639f1b58bd24d01be2"
 
 RUN	cd ~ && \
 	git clone https://github.com/tootsuite/mastodon.git . && \
