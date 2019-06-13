@@ -34,7 +34,7 @@ RUN	apk add libressl2.7-libssl && \
 USER mastodon
 
 # Build and install Masto
-ENV MASTO_HASH="7d92c2c81d564d2648a362c20bc7914cd377525f"
+ENV MASTO_HASH="c9eeb2e832b5b36a86028bbec7a353c32be510a7"
 RUN cd ~ && \
     git clone https://github.com/tootsuite/mastodon . && \
     git checkout $MASTO_HASH && \
