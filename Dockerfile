@@ -1,6 +1,6 @@
-FROM sirboops/nodejs:8.16.0-alpine as node
-FROM sirboops/ruby:2.6.3-alpine as ruby
-FROM alpine:3.9
+FROM sirboops/nodejs:8.16.1-alpine as node
+FROM sirboops/ruby:2.6.4-alpine as ruby
+FROM alpine:3.10.2
 
 # Use ash for the shell
 SHELL ["ash","-c"]
@@ -34,7 +34,7 @@ RUN	apk add libressl2.7-libssl && \
 USER mastodon
 
 # Build and install Masto
-ENV MASTO_HASH="66ac1bd063882f5a2f828c1c702089e37f36f217"
+ENV MASTO_HASH="06f906acace5770fc10f333a203b036c5b72c849"
 RUN cd ~ && \
     git clone https://github.com/tootsuite/mastodon . && \
     git checkout $MASTO_HASH && \
