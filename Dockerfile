@@ -26,7 +26,7 @@ RUN	apk add libressl2.7-libssl && \
 	apk --no-cache --virtual deps add \
       git gcc g++ make zlib-dev icu-dev \
       postgresql-dev libidn-dev protobuf-dev \
-      python && \
+      python linux-headers && \
 	npm install -g yarn && \
 	gem install bundler
 
