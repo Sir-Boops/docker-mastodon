@@ -1,4 +1,4 @@
-FROM sirboops/nodejs:12.11.1-alpine as node
+FROM sirboops/nodejs:8.16.1-alpine as node
 FROM sirboops/ruby:2.6.5-alpine as ruby
 FROM alpine:3.10.2
 
