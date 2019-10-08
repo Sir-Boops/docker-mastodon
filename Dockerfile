@@ -58,7 +58,7 @@ RUN chmod +x /tini
 # System Cleanup and runtime dep installation
 RUN apk --no-cache add ca-certificates \
       ffmpeg file imagemagick icu-libs \
-      tzdata libidn protobuf libpq linux-headers && \
+      tzdata libidn protobuf libpq libc6-compat && \
 	apk --purge del deps && \
 	ln -s /opt/mastodon /mastodon
 
